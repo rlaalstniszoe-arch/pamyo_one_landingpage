@@ -32,6 +32,26 @@ const Scenario: React.FC<{ title: string; content: string; author: string }> = (
   </div>
 );
 
+const ComingSoonModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4" onClick={onClose}>
+    <div className="glass-card rounded-3xl p-10 max-w-md w-full border-burgundy/30 shadow-3xl bg-black/90" onClick={(e) => e.stopPropagation()}>
+      <div className="text-center space-y-6">
+        <div className="text-6xl">⚙️</div>
+        <h3 className="text-2xl font-bold tracking-tight">서비스 준비 중입니다</h3>
+        <p className="text-gray-400 leading-relaxed">
+          더 나은 경험을 위해 파묘 팀이 열심히 개발하고 있어요.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full px-8 py-4 bg-burgundy hover:bg-burgundy-light rounded-2xl font-bold transition-all active:scale-95"
+        >
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -42,6 +62,14 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setIsOpen(false);
+    }
+  };
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-black/90 backdrop-blur-xl py-4 border-b border-burgundy/10' : 'bg-transparent py-8'}`}>
       <div className="max-w-7xl mx-auto px-8 flex justify-between items-center">
@@ -51,10 +79,10 @@ const Navbar: React.FC = () => {
         </div>
         
         <div className="hidden md:flex items-center gap-10 font-semibold text-sm text-gray-400">
-          <a href="#features" className="hover:text-burgundy-light transition-colors">기능</a>
-          <a href="#scenarios" className="hover:text-burgundy-light transition-colors">스토리</a>
-          <a href="#why" className="hover:text-burgundy-light transition-colors">차별점</a>
-          <button className="bg-burgundy text-white px-6 py-2.5 rounded-full hover:bg-burgundy-light transition-all active:scale-95 shadow-lg shadow-burgundy/20 cta-glow">
+          <button onClick={() => scrollToSection('features')} className="hover:text-burgundy-light transition-colors">기능</button>
+          <button onClick={() => scrollToSection('scenarios')} className="hover:text-burgundy-light transition-colors">스토리</button>
+          <button onClick={() => scrollToSection('why')} className="hover:text-burgundy-light transition-colors">차별점</button>
+          <button onClick={() => (window as any).showComingSoon?.()} className="bg-burgundy text-white px-6 py-2.5 rounded-full hover:bg-burgundy-light transition-all active:scale-95 shadow-lg shadow-burgundy/20 cta-glow">
             지금 시작하기
           </button>
         </div>
@@ -66,10 +94,10 @@ const Navbar: React.FC = () => {
 
       {isOpen && (
         <div className="md:hidden bg-black absolute top-full left-0 right-0 p-8 flex flex-col gap-6 border-b border-burgundy/10 animate-fade-in shadow-2xl">
-          <a href="#features" className="text-lg font-medium text-gray-300 hover:text-burgundy" onClick={() => setIsOpen(false)}>기능</a>
-          <a href="#scenarios" className="text-lg font-medium text-gray-300 hover:text-burgundy" onClick={() => setIsOpen(false)}>스토리</a>
-          <a href="#why" className="text-lg font-medium text-gray-300 hover:text-burgundy" onClick={() => setIsOpen(false)}>차별점</a>
-          <button className="bg-burgundy text-white px-5 py-4 rounded-2xl font-bold active:scale-95">내 메모 발굴하러 가기</button>
+          <button onClick={() => scrollToSection('features')} className="text-lg font-medium text-gray-300 hover:text-burgundy text-left">기능</button>
+          <button onClick={() => scrollToSection('scenarios')} className="text-lg font-medium text-gray-300 hover:text-burgundy text-left">스토리</button>
+          <button onClick={() => scrollToSection('why')} className="text-lg font-medium text-gray-300 hover:text-burgundy text-left">차별점</button>
+          <button onClick={() => (window as any).showComingSoon?.()} className="bg-burgundy text-white px-5 py-4 rounded-2xl font-bold active:scale-95">내 메모 파묘하러 가기</button>
         </div>
       )}
     </nav>
@@ -78,6 +106,14 @@ const Navbar: React.FC = () => {
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showComingSoon, setShowComingSoon] = useState(false);
+
+  useEffect(() => {
+    (window as any).showComingSoon = () => setShowComingSoon(true);
+    return () => {
+      delete (window as any).showComingSoon;
+    };
+  }, []);
 
   useEffect(() => {
     const texts = ["지난주 시험 범위가 뭐였지?", "어제 떠올랐던 기획 아이디어", "회의록에서 언급된 수치 찾아줘"];
@@ -112,6 +148,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen selection:bg-burgundy selection:text-white">
+      {showComingSoon && <ComingSoonModal onClose={() => setShowComingSoon(false)} />}
       <Navbar />
 
       {/* 1. Hero Section */}
@@ -131,10 +168,10 @@ export default function App() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6">
-            <button className="w-full sm:w-auto px-10 py-5 bg-burgundy hover:bg-burgundy-light rounded-2xl font-bold text-lg shadow-2xl shadow-burgundy/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cta-glow">
-              지금 발굴 시작하기 <ChevronRight size={20} />
+            <button onClick={() => setShowComingSoon(true)} className="w-full sm:w-auto px-10 py-5 bg-burgundy hover:bg-burgundy-light rounded-2xl font-bold text-lg shadow-2xl shadow-burgundy/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cta-glow">
+              지금 파묘 시작하기 <ChevronRight size={20} />
             </button>
-            <button className="w-full sm:w-auto px-10 py-5 glass-card hover:bg-white/5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 border-white/10">
+            <button onClick={() => setShowComingSoon(true)} className="w-full sm:w-auto px-10 py-5 glass-card hover:bg-white/5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 border-white/10">
               체험해보기
             </button>
           </div>
@@ -151,7 +188,7 @@ export default function App() {
                 <div className="bg-burgundy/10 p-6 rounded-2xl text-left border border-burgundy/20 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-burgundy rounded-full animate-ping"></div>
-                    <p className="font-bold text-burgundy-light text-sm uppercase tracking-wider">AI 발굴 결과</p>
+                    <p className="font-bold text-burgundy-light text-sm uppercase tracking-wider">AI 파묘 결과</p>
                   </div>
                   <p className="text-gray-200 leading-relaxed font-medium text-sm md:text-base">
                     지난 5월 '전략 기획' 폴더에 저장하신 메모에 따르면, <br />
@@ -234,8 +271,68 @@ export default function App() {
             <FeatureCard 
               icon={<Lock size={28} />}
               title="철저한 보안"
-              description="모든 기록은 강력하게 암호화됩니다. 오직 당신만이 자신의 소중한 생각들을 발굴할 수 있습니다."
+              description="모든 기록은 강력하게 암호화됩니다. 오직 당신만이 자신의 소중한 생각들을 파묘할 수 있습니다."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* 4. App Screenshots Section */}
+      <section className="py-32 px-8 bg-gradient-to-b from-black to-black/95">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20 space-y-4">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight">실제로 이렇게 작동합니다</h2>
+            <p className="text-gray-400 text-xl">당신의 메모가 AI로 재탄생하는 과정을 직접 확인하세요</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Screenshot 1 - AI 검색 */}
+            <div className="group relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-burgundy to-burgundy/50 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative glass-card rounded-3xl p-6 bg-black/60 border-burgundy/20">
+                <div className="aspect-[9/19] bg-gradient-to-b from-gray-900 to-black rounded-2xl overflow-hidden mb-6 flex items-center justify-center border border-burgundy/10">
+                  <img src="/screenshots/ai-search.png" alt="AI 자연어 검색" className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-burgundy-light">🔍 자연어 AI 검색</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  "청소한거 공지 찾아줘"처럼 자연스러운 말로 검색하면 AI가 맥락을 이해하고 정확한 메모를 찾아줍니다.
+                </p>
+              </div>
+            </div>
+
+            {/* Screenshot 2 - 폴더 & 태그 */}
+            <div className="group relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-burgundy to-burgundy/50 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative glass-card rounded-3xl p-6 bg-black/60 border-burgundy/20">
+                <div className="aspect-[9/19] bg-gradient-to-b from-gray-900 to-black rounded-2xl overflow-hidden mb-6 flex items-center justify-center border border-burgundy/10">
+                  <img src="/screenshots/folders.png" alt="스마트 폴더 & 태그" className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-burgundy-light">📁 스마트 폴더 & 태그</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  AI가 자동으로 메모를 주제별로 분류하고 관련 태그를 생성합니다. 수동 정리는 이제 그만.
+                </p>
+              </div>
+            </div>
+
+            {/* Screenshot 3 - 메모 상세 */}
+            <div className="group relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-burgundy to-burgundy/50 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative glass-card rounded-3xl p-6 bg-black/60 border-burgundy/20">
+                <div className="aspect-[9/19] bg-gradient-to-b from-gray-900 to-black rounded-2xl overflow-hidden mb-6 flex items-center justify-center border border-burgundy/10">
+                  <img src="/screenshots/memo-detail.png" alt="메모 상세 보기" className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-burgundy-light">📝 깔끔한 메모 관리</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  폴더와 태그가 자동으로 연결되어 있어 관련된 메모들을 한눈에 탐색할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 text-center">
+            <p className="text-gray-500 text-sm">
+              ✨ 더 많은 기능들이 곧 공개됩니다
+            </p>
           </div>
         </div>
       </section>
@@ -244,7 +341,7 @@ export default function App() {
       <section id="scenarios" className="py-32 px-8 bg-white/[0.01]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24 space-y-6">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight">당신의 일상이 발굴되는 순간</h2>
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight">당신의 일상이 파묘되는 순간</h2>
             <p className="text-gray-400 text-xl">파묘와 함께하는 사용자들의 생생한 기록입니다.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-10">
@@ -284,7 +381,7 @@ export default function App() {
             </div>
             <div className="space-y-4">
               <div className="text-7xl font-black text-burgundy">1초</div>
-              <p className="text-xl font-bold tracking-tight">지체 없는 발굴</p>
+              <p className="text-xl font-bold tracking-tight">지체 없는 파묘</p>
               <p className="text-gray-500 leading-relaxed">복잡한 필터링 대신<br />대화하듯 바로 찾습니다.</p>
             </div>
             <div className="space-y-4">
@@ -302,14 +399,14 @@ export default function App() {
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-burgundy/10 blur-[120px] -z-10 rounded-full"></div>
           <h2 className="text-4xl md:text-7xl font-black mb-8 leading-tight tracking-tighter">
             지금, 당신의 기억을 <br className="md:hidden" />
-            <span className="text-burgundy">발굴</span>해보세요.
+            <span className="text-burgundy">파묘</span>해보세요.
           </h2>
           <p className="text-gray-300 text-xl mb-16 max-w-2xl mx-auto font-medium">
             매일 쏟아지는 정보들 속에서 길을 잃지 않도록. <br />
             파묘가 당신의 가장 든든한 기록 비서가 되어드릴게요.
           </p>
           <div className="flex flex-col items-center gap-6">
-             <button className="px-12 py-6 bg-burgundy text-white hover:bg-burgundy-light rounded-[2rem] font-bold text-2xl shadow-2xl shadow-burgundy/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-3 cta-glow">
+             <button onClick={() => setShowComingSoon(true)} className="px-12 py-6 bg-burgundy text-white hover:bg-burgundy-light rounded-[2rem] font-bold text-2xl shadow-2xl shadow-burgundy/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-3 cta-glow">
               무료로 시작하기 <ArrowRight size={24} />
             </button>
             <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
