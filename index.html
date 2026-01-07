@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>파묘 | 찾던 것이 나왔다</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              burgundy: {
+                DEFAULT: '#a13d39', // 명도를 높인 메인 버건디 (가독성 개선)
+                dark: '#722925',    // 기존 딥 버건디 (포인트/깊이감)
+                light: '#c55a55',   // 밝은 버건디 (강조 텍스트)
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Pretendard', sans-serif;
+        background-color: #0a0a0a;
+        color: #ffffff;
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 50%, #a13d39 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .burgundy-text {
+        color: #a13d39;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(161, 61, 57, 0.2);
+      }
+      @keyframes subtle-float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+      }
+      .floating {
+        animation: subtle-float 5s ease-in-out infinite;
+      }
+      .cta-glow {
+        box-shadow: 0 0 20px rgba(161, 61, 57, 0.3);
+      }
+      .cta-glow:hover {
+        box-shadow: 0 0 35px rgba(161, 61, 57, 0.5);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

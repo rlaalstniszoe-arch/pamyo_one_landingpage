@@ -1,0 +1,5 @@
+{
+  "name": "Pamyo (파묘) - AI Memo Assistant",
+  "description": "AI가 메모의 맥락을 이해해 자동으로 정리하고, 자연어로 검색하면 바로 찾아주는 AI 메모 비서 '파묘'의 랜딩페이지입니다.",
+  "requestFramePermissions": []
+}
